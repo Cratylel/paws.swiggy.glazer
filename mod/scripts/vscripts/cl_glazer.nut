@@ -7,7 +7,6 @@ global function Glazer_StatusCommand
 global function Glazer_TestCommand
 global function Glazer_WhoCommand
 global function Glazer_AddCommand
-global function Glazer_AddUIDCommand
 
 const float GLAZER_ECHO_WINDOW = 6.0
 
@@ -17,7 +16,6 @@ struct
 	array<int> bag
 	table<string, float> recentlySent
 	float lastReplyAt = -1000.0
-	table playerUIDs
 } file
 
 void function Glazer_Init()
@@ -40,13 +38,7 @@ void function Glazer_Init()
 
 	AddCallback_OnReceivedSayTextMessage( Glazer_OnChatMessage )
 
-	AddDestroyCallback( "player", void function( entity player )
-	{
-		if ( player in file.playerUIDs )
-			delete file.playerUIDs[ player ]
-	} )
-
-	print( "[Glazer] Loaded with " + GlazeLines.len() + " glaze lines. Set target names/UIDs in Mod Settings." )
+	print( "[Glazer] Loaded with " + GlazeLines.len() + " glaze lines. Set target usernames in Mod Settings." )
 }
 
 ClClient_MessageStruct function Glazer_OnChatMessage( ClClient_MessageStruct message )
@@ -94,28 +86,33 @@ bool function Glazer_IsEcho( ClClient_MessageStruct message )
 
 bool function Glazer_IsTarget( entity player, string playerName )
 {
-	string uid = Glazer_PlayerUID( player )
-	if ( uid != "" && uid != "0" )
-	{
-		foreach ( string entry in split( GetConVarString( "glaze_target_uids" ), "," ) )
-		{
-			if ( strip( entry ) == uid )
-				return true
-		}
-	}
+	array<string> playerNames
+	playerNames.append( Glazer_NormalizeName( playerName ) )
+	playerNames.append( Glazer_NormalizeName( player.GetPlayerName() ) )
+	playerNames.append( Glazer_NormalizeName( player.GetPlayerNameWithClanTag() ) )
 
-	string taggedName = playerName.tolower()
-	string plainName = player.GetPlayerName().tolower()
-	string untaggedName = Glazer_StripClanTag( taggedName )
+	// Chat can provide a clan-tagged display name while settings usually contain
+	// the account name. Compare both forms, including a configured tagged name.
+	int nameCount = playerNames.len()
+	for ( int i = 0; i < nameCount; i++ )
+	{
+		string untaggedName = Glazer_NormalizeName( Glazer_StripClanTag( playerNames[ i ] ) )
+		if ( untaggedName != playerNames[ i ] )
+			playerNames.append( untaggedName )
+	}
 
 	foreach ( string entry in split( GetConVarString( "glaze_targets" ), "," ) )
 	{
-		string target = strip( entry ).tolower()
+		string target = Glazer_NormalizeName( entry )
 		if ( target == "" )
 			continue
 
-		if ( target == taggedName || target == plainName || target == untaggedName )
-			return true
+		string untaggedTarget = Glazer_NormalizeName( Glazer_StripClanTag( target ) )
+		foreach ( string candidate in playerNames )
+		{
+			if ( target == candidate || untaggedTarget == candidate )
+				return true
+		}
 	}
 
 	return false
@@ -133,42 +130,9 @@ string function Glazer_StripClanTag( string name )
 	return strip( name.slice( expect int( closeBracket ) + 1 ) )
 }
 
-string function Glazer_PlayerUID( entity player )
+string function Glazer_NormalizeName( string name )
 {
-	if ( !IsValid( player ) )
-		return ""
-
-	if ( !( player in file.playerUIDs ) )
-	{
-		// Player slots get reused when someone leaves, so drop stale entities.
-		array<entity> stalePlayers
-		foreach ( entity cachedPlayer, var entry in file.playerUIDs )
-		{
-			if ( !IsValid( cachedPlayer ) )
-				stalePlayers.append( cachedPlayer )
-		}
-
-		foreach ( entity cachedPlayer in stalePlayers )
-			delete file.playerUIDs[ cachedPlayer ]
-
-		file.playerUIDs[ player ] <- { uid = "", nextRead = 0.0 }
-	}
-
-	var entry = file.playerUIDs[ player ]
-	if ( entry.uid != "" || Time() < expect float( entry.nextRead ) )
-		return expect string( entry.uid )
-
-	// Some builds spam the console on every GetUID call, so throttle retries.
-	entry.nextRead = Time() + 2.0
-	var rawUID = player.GetUID()
-	if ( rawUID == null )
-		return ""
-
-	string uid = expect string( rawUID )
-	if ( uid != "" && uid != "0" )
-		entry.uid = uid
-
-	return uid
+	return strip( name ).tolower()
 }
 
 void function Glazer_Reply( string playerName, bool isTeam )
@@ -289,7 +253,7 @@ void function Glazer_ResetCommand( array<string> args = [] )
 void function Glazer_StatusCommand( array<string> args = [] )
 {
 	print( "[Glazer] enabled=" + GetConVarBool( "glaze_enabled" ) + " remaining=" + file.bag.len() + " total=" + GlazeLines.len() )
-	print( "[Glazer] targets=\"" + GetConVarString( "glaze_targets" ) + "\" uids=\"" + GetConVarString( "glaze_target_uids" ) + "\"" )
+	print( "[Glazer] targets=\"" + GetConVarString( "glaze_targets" ) + "\"" )
 }
 
 void function Glazer_TestCommand( array<string> args = [] )
@@ -300,14 +264,13 @@ void function Glazer_TestCommand( array<string> args = [] )
 
 void function Glazer_WhoCommand( array<string> args = [] )
 {
-	print( "[Glazer] Players in this match:" )
+	print( "[Glazer] Players in this match (remote UIDs are not available to client scripts):" )
 	foreach ( entity player in GetPlayerArray() )
 	{
 		if ( !IsValid( player ) )
 			continue
 
-		string uid = Glazer_PlayerUID( player )
-		print( "[Glazer]   " + player.GetPlayerName() + "  |  uid=" + ( uid == "" ? "unknown" : uid ) )
+		print( "[Glazer]   " + player.GetPlayerNameWithClanTag() + "  |  account=" + player.GetPlayerName() )
 	}
 }
 
@@ -323,18 +286,4 @@ void function Glazer_AddCommand( array<string> args = [] )
 	string current = strip( GetConVarString( "glaze_targets" ) )
 	SetConVarString( "glaze_targets", current == "" ? name : current + "," + name )
 	print( "[Glazer] Target list: " + GetConVarString( "glaze_targets" ) )
-}
-
-void function Glazer_AddUIDCommand( array<string> args = [] )
-{
-	if ( args.len() == 0 )
-	{
-		print( "[Glazer] Usage: glaze_adduid <uid>" )
-		return
-	}
-
-	string uid = strip( args[ 0 ] )
-	string current = strip( GetConVarString( "glaze_target_uids" ) )
-	SetConVarString( "glaze_target_uids", current == "" ? uid : current + "," + uid )
-	print( "[Glazer] UID list: " + GetConVarString( "glaze_target_uids" ) )
 }

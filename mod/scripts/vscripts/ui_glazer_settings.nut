@@ -9,7 +9,6 @@ void function Glazer_Settings()
 
 	ModSettings_AddEnumSetting( "glaze_enabled", "Glazer enabled", [ "Off", "On" ] )
 	ModSettings_AddSetting( "glaze_targets", "Target usernames (comma separated)" )
-	ModSettings_AddSetting( "glaze_target_uids", "Target UIDs (comma separated)" )
 
 	ModSettings_AddSliderSetting( "glaze_chance", "Chance to reply per message (%)", 0.0, 100.0, 5.0 )
 	ModSettings_AddSliderSetting( "glaze_cooldown", "Minimum seconds between replies", 0.0, 30.0, 0.5 )

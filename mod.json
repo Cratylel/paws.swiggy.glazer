@@ -38,12 +38,6 @@
             "HelpString": "Comma separated player names to glaze. Clan tags are optional."
         },
         {
-            "Name": "glaze_target_uids",
-            "DefaultValue": "",
-            "Flags": "ARCHIVE_PLAYERPROFILE",
-            "HelpString": "Comma separated player UIDs to glaze. More reliable than names."
-        },
-        {
             "Name": "glaze_chance",
             "DefaultValue": "100",
             "Flags": "ARCHIVE_PLAYERPROFILE",
@@ -110,11 +104,6 @@
         {
             "Name": "glaze_add",
             "Function": "Glazer_AddCommand",
-            "Context": "CLIENT"
-        },
-        {
-            "Name": "glaze_adduid",
-            "Function": "Glazer_AddUIDCommand",
             "Context": "CLIENT"
         }
     ]

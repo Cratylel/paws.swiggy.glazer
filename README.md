@@ -17,8 +17,7 @@ This mod is client-side only. It does not need to be installed on the server and
 | Setting | Meaning |
 | --- | --- |
 | Glazer enabled | Off / On |
-| Target usernames | Comma separated player names. Clan tags are optional (`Name` also matches `[TAG] Name`). |
-| Target UIDs | Comma separated player UIDs. More reliable than names when players rename. |
+| Target usernames | Comma separated player account names. Matching ignores a leading clan tag in the displayed name. |
 | Chance to reply per message | Percent chance. `100` replies to every matching message. |
 | Minimum seconds between replies | Cooldown so a chatty target does not flood chat. |
 | Delay before replying | Optional delay before the reply is sent. |
@@ -31,12 +30,13 @@ This mod is client-side only. It does not need to be installed on the server and
 
 | Command | Meaning |
 | --- | --- |
-| `glaze_who` | Prints every player in the match with their UID, so you can copy one. |
+| `glaze_who` | Prints account and displayed names for every player. Remote UIDs are not exposed to client scripts. |
 | `glaze_add <name>` | Adds a username to the target list. |
-| `glaze_adduid <uid>` | Adds a UID to the target list. |
 | `glaze_status` | Shows settings and how many lines are still unused. |
 | `glaze_reset` | Makes every line available again. |
 | `glaze_test` | Sends one random glaze immediately. |
+
+This mod matches players by username. Northstar exposes the local player's UID to client scripts, but not remote players' UIDs, so UID targeting is unavailable for a client-only mod that works on vanilla servers.
 
 ## Data
 
