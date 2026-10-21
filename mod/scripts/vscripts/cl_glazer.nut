@@ -160,7 +160,7 @@ string function Glazer_PlayerUID( entity player )
 
 	// Some builds spam the console on every GetUID call, so throttle retries.
 	entry.nextRead = Time() + 2.0
-	string uid = GetUID( player )
+	string uid = player.GetUID()
 	if ( uid != "" && uid != "0" )
 		entry.uid = uid
 
@@ -190,16 +190,41 @@ void function Glazer_Reply( string playerName, bool isTeam )
 	if ( maxLength > 3 && text.len() > maxLength )
 		text = Glazer_Trim( text, maxLength )
 
+	text = Glazer_SanitizeChatCommand( text )
+	if ( text == "" )
+		return
+
+	entity localPlayer = GetLocalClientPlayer()
+	if ( !IsValid( localPlayer ) )
+		return
+
 	file.recentlySent[ text ] <- Time()
-	NSSendMessage( text, true, isTeam )
+	string command = isTeam ? "say_team " : "say "
+	localPlayer.ClientCommand( command + text )
 
 	if ( GetConVarBool( "glaze_debug" ) )
 		print( "[Glazer] -> " + playerName + ": " + text )
 }
 
+string function Glazer_SanitizeChatCommand( string text )
+{
+	string safeText = ""
+	for ( int i = 0; i < text.len(); i++ )
+	{
+		string character = text.slice( i, i + 1 )
+		if ( character == "\"" || character == ";" || character == "%" || character == "\n" || character == "\r" )
+			continue
+
+		safeText += character
+	}
+
+	return strip( safeText )
+}
+
 string function Glazer_Trim( string text, int maxLength )
 {
-	string cut = text.slice( 0, maxLength )
+	int contentLength = maxLength - 3
+	string cut = text.slice( 0, contentLength )
 	int lastSpace = -1
 	int searchFrom = 0
 
@@ -213,7 +238,7 @@ string function Glazer_Trim( string text, int maxLength )
 		searchFrom = lastSpace + 1
 	}
 
-	if ( lastSpace > maxLength / 2 )
+	if ( lastSpace > contentLength / 2 )
 		cut = cut.slice( 0, lastSpace )
 
 	return strip( cut ) + "..."

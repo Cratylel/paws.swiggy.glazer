@@ -1,6 +1,6 @@
 untyped
 
-::GlazeLines <- [
+global array<string> GlazeLines = [
 	"I would let Swighetti use my throat until he is satisfied",
 	"Swighetti please own me in every way that matters and I mean it",
 	"I would let Swighetti leave me ruined and happy full stop",

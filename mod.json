@@ -20,7 +20,7 @@
             "Path": "ui_glazer_settings.nut",
             "RunOn": "UI",
             "UICallback": {
-                "After": "Glazer_Settings"
+                "Before": "Glazer_Settings"
             }
         }
     ],
