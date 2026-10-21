@@ -30,7 +30,7 @@ This mod is client-side only. It does not need to be installed on the server and
 
 | Command | Meaning |
 | --- | --- |
-| `glaze_who` | Prints account and displayed names for every player. Remote UIDs are not exposed to client scripts. |
+| `glaze_who` | Prints account and displayed names for every player. Remote UIDs are not exposed to client scripts. (yes yes yes its possible bla bla i cant be bothered) |
 | `glaze_add <name>` | Adds a username to the target list. |
 | `glaze_status` | Shows settings and how many lines are still unused. |
 | `glaze_reset` | Makes every line available again. |
