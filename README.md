@@ -1,4 +1,4 @@
-# paws_glazer
+# paws.swiggy.glazer
 
 Client-side Northstar mod for Titanfall 2. It watches in-game chat and, when one of the players you configured says anything, replies with a random glaze line from `glaze.txt`.
 
@@ -6,9 +6,9 @@ Every line is used at most once per match, so it never repeats itself in the sam
 
 ## Install
 
-1. Copy this whole folder into your Northstar `mods/` directory, so it ends up as `mods/paws_glazer/`.
+1. Copy this whole folder into your Northstar `mods/` directory, so it ends up as `mods/paws.swiggy.glazer/`.
 2. Launch the game and open **Mod Settings**.
-3. Open the **paws_glazer** section and set your targets.
+3. Open the **paws.swiggy.glazer** section and set your targets.
 
 This mod is client-side only. It does not need to be installed on the server and does not affect other players' mods.
 

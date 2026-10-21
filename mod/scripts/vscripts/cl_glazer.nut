@@ -160,7 +160,11 @@ string function Glazer_PlayerUID( entity player )
 
 	// Some builds spam the console on every GetUID call, so throttle retries.
 	entry.nextRead = Time() + 2.0
-	string uid = player.GetUID()
+	var rawUID = player.GetUID()
+	if ( rawUID == null )
+		return ""
+
+	string uid = expect string( rawUID )
 	if ( uid != "" && uid != "0" )
 		entry.uid = uid
 

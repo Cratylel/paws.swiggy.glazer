@@ -1,5 +1,5 @@
 {
-    "Name": "paws_glazer",
+    "Name": "paws.swiggy.glazer",
     "Description": "Watches chat for configured players and replies with a random glaze line. Never repeats a line within the same match.",
     "Version": "1.0.0",
     "LoadPriority": 40,

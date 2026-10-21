@@ -4,7 +4,7 @@ global function Glazer_Settings
 
 void function Glazer_Settings()
 {
-	ModSettings_AddModTitle( "paws_glazer" )
+	ModSettings_AddModTitle( "paws.swiggy.glazer" )
 	ModSettings_AddModCategory( "Glaze" )
 
 	ModSettings_AddEnumSetting( "glaze_enabled", "Glazer enabled", [ "Off", "On" ] )
