@@ -1,0 +1,43 @@
+# paws_glazer
+
+Client-side Northstar mod for Titanfall 2. It watches in-game chat and, when one of the players you configured says anything, replies with a random glaze line from `glaze.txt`.
+
+Every line is used at most once per match, so it never repeats itself in the same game. The used-line list is reset automatically on the next map, or manually with `glaze_reset`.
+
+## Install
+
+1. Copy this whole folder into your Northstar `mods/` directory, so it ends up as `mods/paws_glazer/`.
+2. Launch the game and open **Mod Settings**.
+3. Open the **paws_glazer** section and set your targets.
+
+This mod is client-side only. It does not need to be installed on the server and does not affect other players' mods.
+
+## Settings
+
+| Setting | Meaning |
+| --- | --- |
+| Glazer enabled | Off / On |
+| Target usernames | Comma separated player names. Clan tags are optional (`Name` also matches `[TAG] Name`). |
+| Target UIDs | Comma separated player UIDs. More reliable than names when players rename. |
+| Chance to reply per message | Percent chance. `100` replies to every matching message. |
+| Minimum seconds between replies | Cooldown so a chatty target does not flood chat. |
+| Delay before replying | Optional delay before the reply is sent. |
+| Prefix before each glaze | Optional text such as `glaze: ` in front of every line. |
+| Maximum reply length | Trims long lines at a word boundary. `0` disables trimming. |
+| Reply channel | Always global, or the same channel the target used (team chat stays team chat). |
+| Console debug output | Prints every reply to the console. |
+
+## Console commands
+
+| Command | Meaning |
+| --- | --- |
+| `glaze_who` | Prints every player in the match with their UID, so you can copy one. |
+| `glaze_add <name>` | Adds a username to the target list. |
+| `glaze_adduid <uid>` | Adds a UID to the target list. |
+| `glaze_status` | Shows settings and how many lines are still unused. |
+| `glaze_reset` | Makes every line available again. |
+| `glaze_test` | Sends one random glaze immediately. |
+
+## Data
+
+`mod/scripts/vscripts/sh_glazer_data.nut` is generated from `glaze.txt` (one line per glaze, the leading number stripped). To change the lines, edit `glaze.txt` and regenerate that file, or edit the array directly.

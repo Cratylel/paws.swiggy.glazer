@@ -1,0 +1,121 @@
+{
+    "Name": "paws_glazer",
+    "Description": "Watches chat for configured players and replies with a random glaze line. Never repeats a line within the same match.",
+    "Version": "1.0.0",
+    "LoadPriority": 40,
+    "RequiredOnClient": false,
+    "Scripts": [
+        {
+            "Path": "sh_glazer_data.nut",
+            "RunOn": "CLIENT && MP"
+        },
+        {
+            "Path": "cl_glazer.nut",
+            "RunOn": "CLIENT && MP",
+            "ClientCallback": {
+                "Before": "Glazer_Init"
+            }
+        },
+        {
+            "Path": "ui_glazer_settings.nut",
+            "RunOn": "UI",
+            "UICallback": {
+                "After": "Glazer_Settings"
+            }
+        }
+    ],
+    "ConVars": [
+        {
+            "Name": "glaze_enabled",
+            "DefaultValue": "1",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Turn the glazer on or off."
+        },
+        {
+            "Name": "glaze_targets",
+            "DefaultValue": "",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Comma separated player names to glaze. Clan tags are optional."
+        },
+        {
+            "Name": "glaze_target_uids",
+            "DefaultValue": "",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Comma separated player UIDs to glaze. More reliable than names."
+        },
+        {
+            "Name": "glaze_chance",
+            "DefaultValue": "100",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Percent chance to reply to each matching message."
+        },
+        {
+            "Name": "glaze_cooldown",
+            "DefaultValue": "2.0",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Minimum seconds between replies."
+        },
+        {
+            "Name": "glaze_delay",
+            "DefaultValue": "0",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Seconds to wait before sending the reply."
+        },
+        {
+            "Name": "glaze_prefix",
+            "DefaultValue": "",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Optional prefix added before every glaze."
+        },
+        {
+            "Name": "glaze_reply_team",
+            "DefaultValue": "1",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "1 = reply in the same chat channel the target used, 0 = always global."
+        },
+        {
+            "Name": "glaze_maxlen",
+            "DefaultValue": "128",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Maximum reply length. 0 disables trimming."
+        },
+        {
+            "Name": "glaze_debug",
+            "DefaultValue": "0",
+            "Flags": "ARCHIVE_PLAYERPROFILE",
+            "HelpString": "Print each sent glaze to the console."
+        }
+    ],
+    "ConCommands": [
+        {
+            "Name": "glaze_reset",
+            "Function": "Glazer_ResetCommand",
+            "Context": "CLIENT"
+        },
+        {
+            "Name": "glaze_status",
+            "Function": "Glazer_StatusCommand",
+            "Context": "CLIENT"
+        },
+        {
+            "Name": "glaze_test",
+            "Function": "Glazer_TestCommand",
+            "Context": "CLIENT"
+        },
+        {
+            "Name": "glaze_who",
+            "Function": "Glazer_WhoCommand",
+            "Context": "CLIENT"
+        },
+        {
+            "Name": "glaze_add",
+            "Function": "Glazer_AddCommand",
+            "Context": "CLIENT"
+        },
+        {
+            "Name": "glaze_adduid",
+            "Function": "Glazer_AddUIDCommand",
+            "Context": "CLIENT"
+        }
+    ]
+}
