@@ -30,12 +30,8 @@ void function Glazer_Init()
 
 	file.initialized = true
 
-	if ( !( "AddCallback_OnReceivedSayTextMessage" in getroottable() ) )
-	{
-		print( "[Glazer] This Northstar version is too old for the chat callback. Update Northstar (1.6.0 or newer)." )
-		return
-	}
-
+	// Match the working Translator mod: register the chat hook directly. The
+	// getroottable() check can miss engine-provided callbacks and skip registration.
 	AddCallback_OnReceivedSayTextMessage( Glazer_OnChatMessage )
 
 	print( "[Glazer] Loaded with " + GlazeLines.len() + " glaze lines. Set target usernames in Mod Settings." )
@@ -43,8 +39,12 @@ void function Glazer_Init()
 
 ClClient_MessageStruct function Glazer_OnChatMessage( ClClient_MessageStruct message )
 {
+	Glazer_Debug( "Chat hook fired; sender=\"" + message.playerName + "\"" )
 	if ( Glazer_ShouldReply( message ) )
+	{
+		Glazer_Debug( "Target matched; queuing reply." )
 		thread Glazer_Reply( message.playerName, message.isTeam )
+	}
 
 	return message
 }
@@ -52,24 +52,51 @@ ClClient_MessageStruct function Glazer_OnChatMessage( ClClient_MessageStruct mes
 bool function Glazer_ShouldReply( ClClient_MessageStruct message )
 {
 	if ( !GetConVarBool( "glaze_enabled" ) )
+	{
+		Glazer_Debug( "Ignoring chat: glazer is disabled." )
 		return false
+	}
 
 	if ( message.player == null || !IsValid( message.player ) )
+	{
+		Glazer_Debug( "Ignoring chat: sender entity is unavailable." )
 		return false
+	}
 
 	if ( message.message == "" )
+	{
+		Glazer_Debug( "Ignoring chat: message is empty." )
 		return false
+	}
 
 	if ( Glazer_IsEcho( message ) )
+	{
+		Glazer_Debug( "Ignoring chat: this is the local player's own message." )
 		return false
+	}
 
 	if ( Time() - file.lastReplyAt < GetConVarFloat( "glaze_cooldown" ) )
+	{
+		Glazer_Debug( "Ignoring chat: reply cooldown is active." )
 		return false
+	}
 
 	if ( RandomInt( 100 ) >= GetConVarInt( "glaze_chance" ) )
+	{
+		Glazer_Debug( "Ignoring chat: chance roll did not pass." )
 		return false
+	}
 
-	return Glazer_IsTarget( message.player, message.playerName )
+	bool isTarget = Glazer_IsTarget( message.player, message.playerName )
+	if ( !isTarget )
+		Glazer_Debug( "No username match for \"" + message.playerName + "\"." )
+	return isTarget
+}
+
+void function Glazer_Debug( string text )
+{
+	if ( GetConVarBool( "glaze_debug" ) )
+		print( "[Glazer] " + text )
 }
 
 bool function Glazer_IsEcho( ClClient_MessageStruct message )
